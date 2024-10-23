@@ -1,7 +1,7 @@
 [package]
 name = "rmbg"
 description = "Rust interface for BRIA Background Removal v1.4 Model Library"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
 repository = "https://github.com/pekc83/rmbg"
@@ -12,11 +12,8 @@ keywords = ["background-removal", "machine-learning", "onnx"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ort = { version = "2.0.0-rc.1", default-features = false, features = ["ndarray"] }
+ort = "1.16.3"
 image = "0.25.0"
 anyhow = "1.0.81"
 ndarray = "0.15.6"
 fast_image_resize = "3.0.4"
-
-[dev-dependencies]
-ort = { version = "2.0.0-rc.1", default-features = false, features = ["download-binaries"] }

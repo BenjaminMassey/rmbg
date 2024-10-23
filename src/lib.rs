@@ -7,8 +7,6 @@ use std::path::Path;
 
 const ML_MODEL_IMAGE_WIDTH: u32 = 1024;
 const ML_MODEL_IMAGE_HEIGHT: u32 = 1024;
-const ML_MODEL_INPUT_NAME: &str = "input";
-const ML_MODEL_OUTPUT_NAME: &str = "output";
 
 /// A struct for removing backgrounds from images using a machine learning model.
 ///
@@ -41,8 +39,13 @@ impl Rmbg {
     /// use rmbg::Rmbg;
     /// let rmbg = Rmbg::new("path/to/model.onnx").expect("Failed to load model");
     /// ```
-    pub fn new(model_path: impl AsRef<Path>) -> Result<Self, ort::Error> {
-        let model = ort::Session::builder()?.commit_from_file(model_path)?;
+    pub fn new(model_path: impl AsRef<Path>) -> Result<Self, ort::error::OrtError> {
+        let environment = ort::environment::Environment::builder()
+            .with_name("rmbg")
+            .with_log_level(ort::LoggingLevel::Verbose)
+            .build()?
+            .into_arc();
+        let model = ort::SessionBuilder::new(&environment)?.with_model_from_file(model_path)?;
         Ok(Rmbg { model })
     }
 
@@ -73,11 +76,12 @@ impl Rmbg {
         let img = preprocess_image(original_img)?;
 
         let input = img.insert_axis(Axis(0));
-        let inputs = ort::inputs![ML_MODEL_INPUT_NAME => input.view()]?;
+        let input_dyn: ndarray::CowArray<f32, _> = ndarray::CowArray::from(input.into_dyn());
+        let inputs = vec![ort::Value::from_array(self.model.allocator(), &input_dyn)?];
 
         let outputs = self.model.run(inputs)?;
 
-        let output = outputs[ML_MODEL_OUTPUT_NAME].try_extract_tensor()?;
+        let output = outputs[0].try_extract()?;
         let view = output.view();
         let output: ArrayView<f32, Dim<[usize; 2]>> = view.slice(s![0, 0, .., ..]);
 
