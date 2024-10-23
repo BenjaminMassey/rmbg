@@ -25,32 +25,11 @@ Place the downloaded `model.onnx` file in a known directory within your project.
 
 ### Installation
 
-Add `rmbg` to your `Cargo.toml` file:
+Either use `cargo add rmbg` from the terminal, or add `rmbg` to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-rmbg = { version = "0.1.0", default-features = false }
-```
-
-#### Note for Library Developers
-
-If you are developing a library that includes `rmbg`, it is heavily recommended to disable default features to avoid
-unnecessary bloat. Cargo features are additive, and enabling default features in a library can prevent downstream users
-from opting out of those features, leading to increased compile times and binary sizes.
-
-Instead, enable the necessary features in your development dependencies as follows:
-
-```toml
-[dev-dependencies]
-rmbg = { version = "0.1.0", features = ["download-binaries"] }
-```
-
-Instruct downstream users to include `ort` in their dependencies if needed, with the `download-binaries` feature
-enabled:
-
-```toml
-[dependencies]
-ort = { version = "...", features = ["download-binaries"] }
+rmbg = "0.1.1"
 ```
 
 ### Usage
@@ -62,22 +41,23 @@ Here's a simple example:
 
 ```rust
 use rmbg::Rmbg;
-use image::DynamicImage;
 
-fn main() -> anyhow::Result<()> {
+fn main() {
     // Load the model
-    let rmbg = Rmbg::new("path/to/model.onnx")?;
+    let rmbg = Rmbg::new("path/to/model.onnx").unwrap();
 
     // Load an image
-    let original_img = image::open("path/to/image.png")?;
+    let original_img = image::open("path/to/image.png").unwrap();
 
     // Remove the background
-    let img_without_bg = rmbg.remove_background(&original_img)?;
+    let img_without_bg = rmbg.remove_background(&original_img).unwrap();
 
     // Save or further process `img_without_bg` as needed
-    Ok(())
+    let _ = img_without_bg.save("path/for/result.png");
 }
 ```
+
+A note that this is reliant on the [`image` crate](https://crates.io/crates/image), so make sure to `cargo add image`.
 
 ## License
 
