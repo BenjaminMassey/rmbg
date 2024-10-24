@@ -32,6 +32,15 @@ Either use `cargo add rmbg` from the terminal, or add `rmbg` to your `Cargo.toml
 rmbg = "0.1.1"
 ```
 
+For the sake of easy startup, `rmbg` by default activates `ort`'s `download-binaries` feature flag with its own feature flag `download-binaries` (simply a pass-through). See [`ort`'s documentation on features](https://docs.rs/crate/ort/latest#cargo-features) to understand what that does. If you want to avoid
+using this feature flag of `ort`, then you will need to disable default features of this crate,
+like the following:
+
+```toml
+[dependencies]
+rmbg = { version = "0.1.1", default-features = false }
+```
+
 ### Usage
 
 To use the `rmbg` crate in your project, first, initialize an instance of the `Rmbg` struct with the path to

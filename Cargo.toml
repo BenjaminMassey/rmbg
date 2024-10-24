@@ -12,8 +12,12 @@ keywords = ["background-removal", "machine-learning", "onnx"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ort = "1.16.3"
+ort = { version = "1.16.3", default-features = false, features = [ "copy-dylibs", "half" ] }
 image = "0.25.0"
 anyhow = "1.0.81"
 ndarray = "0.15.6"
 fast_image_resize = "3.0.4"
+
+[features]
+default = [ "download-binaries" ]
+download-binaries = [ "ort/download-binaries" ]
